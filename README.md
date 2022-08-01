@@ -1,1 +1,0 @@
-# ufrgs-2022-1-AI-part2
