@@ -8,14 +8,19 @@ import xml.dom.minidom
 import advsearch.othello.board as board
 import advsearch.timer as timer
 
-def player_name(player_dir:str) -> str:
+
+def player_name(player_dir: str) -> str:
     """
     Removes leading 'advsearch.' or 'advsearch/' from the player directory
     :param player_dir:
     :return:
     """
     if player_dir.startswith('advsearch'):
-        return player_dir[len('advsearch')+1:]  # +1 to account for the / or .
+        # +1 to account for the / or .
+        return player_dir[len('advsearch') + 1:]
+
+    return ""
+
 
 class Server(object):
     """
@@ -75,25 +80,32 @@ class Server(object):
 
         illegal_count = [0, 0]  # counts the number of illegal move attempts
 
-        print(f'---- Current match: {self.player_dirs[0]} (B) x {self.player_dirs[1]} (W) ----')
+        print(
+            f'---- Current match: {self.player_dirs[0]} (B) x {self.player_dirs[1]} (W) ----')
         print('Initial board:')
         print(self.board.decorated_str(colors=False))
 
         while True:  # runs until endgame
 
             # checks whether players have available moves
-            no_moves_current = len(self.board.legal_moves(self.player_colors[player])) == 0
-            no_moves_opponent = len(self.board.legal_moves(self.board.opponent(self.player_colors[player]))) == 0
+            no_moves_current = len(self.board.legal_moves(
+                self.player_colors[player])) == 0
+            no_moves_opponent = len(self.board.legal_moves(
+                self.board.opponent(self.player_colors[player]))) == 0
 
             # calculates scores
-            p1_score = sum([1 for char in str(self.board) if char == self.board.BLACK])
-            p2_score = sum([1 for char in str(self.board) if char == self.board.WHITE])
+            p1_score = sum([1 for char in str(self.board)
+                           if char == self.board.BLACK])
+            p2_score = sum([1 for char in str(self.board)
+                           if char == self.board.WHITE])
 
-            print(f'---- Current match: {self.player_dirs[0]} (B) x {self.player_dirs[1]} (W) ----')
+            print(
+                f'---- Current match: {self.player_dirs[0]} (B) x {self.player_dirs[1]} (W) ----')
 
             # disqualify player if he attempts illegal moves 5 times in a row
             if illegal_count[player] >= 5:
-                print(f'Player {player+1} ({self.player_dirs[player]}) DISQUALIFIED! Too many illegal move attempts.')
+                print(
+                    f'Player {player+1} ({self.player_dirs[player]}) DISQUALIFIED! Too many illegal move attempts.')
                 print('End of game reached!')
                 print('Player 1 (B): %d' % p1_score)
                 print('Player 2 (W): %d' % p2_score)
@@ -122,7 +134,8 @@ class Server(object):
 
             # if current player has no moves, toggle player and continue
             if no_moves_current:
-                print(f'Player {player+1} ({self.player_dirs[player]}) has no legal moves and will not play this turn.')
+                print(
+                    f'Player {player+1} ({self.player_dirs[player]}) has no legal moves and will not play this turn.')
                 illegal_count[player] = 0
                 player = 1 - player
                 time.sleep(self.pace)
@@ -133,15 +146,18 @@ class Server(object):
 
             # calls current player's make_move function with the specified timeout
             start = time.time()
-            function_call = timer.FunctionTimer(self.player_modules[player].make_move, (board_copy, self.player_colors[player]))
-            
-            delay = 60 if player_name(self.player_dirs[player]) == "humanplayer" else self.delay
+            function_call = timer.FunctionTimer(
+                self.player_modules[player].make_move, (board_copy, self.player_colors[player]))
+
+            delay = 60 if player_name(
+                self.player_dirs[player]) == "humanplayer" else self.delay
             move = function_call.run(delay)
-                
+
             elapsed = time.time() - start
 
             if move is None:  # detects timeout
-                print('Player %d has not made a move and lost its turn. Illegal moves count incremented' % (player + 1))
+                print('Player %d has not made a move and lost its turn. Illegal moves count incremented' % (
+                    player + 1))
                 illegal_count[player] += 1
                 player = 1 - player
                 continue
@@ -150,23 +166,28 @@ class Server(object):
 
             # checks for move validity
             if not isinstance(move_x, int):
-                print(f'Warning! move_x is {type(move_x)} but should be integer!')
+                print(
+                    f'Warning! move_x is {type(move_x)} but should be integer!')
                 move_x = -1
             if not isinstance(move_y, int):
-                print(f'Warning! move_y is {type(move_y)} but should be integer!')
+                print(
+                    f'Warning! move_y is {type(move_y)} but should be integer!')
                 move_y = -1
 
             # saves move in history
-            self.history_file.write('%d,%d,%s\n' % (move_x, move_y, self.player_colors[player]))
+            self.history_file.write('%d,%d,%s\n' % (
+                move_x, move_y, self.player_colors[player]))
             self.history.append(((move_x, move_y), self.player_colors[player]))
 
             if self.board.process_move((move_x, move_y), self.player_colors[player]):
                 illegal_count[player] = 0
-                print('Player %d move %d,%d accepted.' % (player + 1, move_x, move_y))
+                print('Player %d move %d,%d accepted.' %
+                      (player + 1, move_x, move_y))
 
             else:
                 illegal_count[player] += 1
-                print('Player %d move %d,%d ILLEGAL!' % (player + 1,move_x, move_y))
+                print('Player %d move %d,%d ILLEGAL!' %
+                      (player + 1, move_x, move_y))
 
             # waits the remaining time, if needed
             if self.pace - elapsed > 0:
@@ -203,7 +224,8 @@ class Server(object):
             elem.set('directory', p)
             elem.set('color', colors[idx])
 
-            result = 'win' if scores[idx] > scores[idx - 1] else 'loss' if scores[idx] < scores[idx - 1] else 'draw'
+            result = 'win' if scores[idx] > scores[idx -
+                                                   1] else 'loss' if scores[idx] < scores[idx - 1] else 'draw'
             elem.set('result', result)
             elem.set('score', str(scores[idx]))
 
@@ -216,7 +238,8 @@ class Server(object):
 
         # preety xml thanks to: https://stackoverflow.com/a/1206856/1251716
         ugly_xml = ET.tostring(root).decode('utf-8')
-        dom = xml.dom.minidom.parseString(ugly_xml)  # or xml.dom.minidom.parseString(xml_string)
+        # or xml.dom.minidom.parseString(xml_string)
+        dom = xml.dom.minidom.parseString(ugly_xml)
         pretty_xml = dom.toprettyxml()
         f = open(self.output_file, 'w')
         f.write(pretty_xml)

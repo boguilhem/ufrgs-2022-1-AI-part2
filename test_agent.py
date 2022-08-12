@@ -2,7 +2,8 @@ import unittest
 
 import advsearch.othello.board as board
 import advsearch.timer as timer
-import advsearch.your_agent.agent as agent  # change your_agent by the name of your agent module
+# change your_agent by the name of your agent module
+import advsearch.your_agent.agent as agent
 
 
 class TestAgent(unittest.TestCase):
@@ -28,7 +29,7 @@ class TestAgent(unittest.TestCase):
         """
         # triple-quoted string must be 'glued' to the left because indentation becomes part of the string
         b = board.from_string(
-"""WWWWWWWW
+            """WWWWWWWW
 WWWWWBBW
 WWWWBWBW
 WBWBWBBW
