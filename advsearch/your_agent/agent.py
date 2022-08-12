@@ -1,5 +1,7 @@
 import random
-import sys
+import math
+import copy
+from ..othello import board
 
 # Voce pode criar funcoes auxiliares neste arquivo
 # e tambem modulos auxiliares neste pacote.
@@ -18,5 +20,22 @@ def make_move(the_board, color):
     # o codigo abaixo apenas retorna um movimento aleatorio valido para
     # a primeira jogada com as pretas.
     # Remova-o e coloque a sua implementacao da poda alpha-beta
-    return random.choice([(2, 3), (4, 5), (5, 4), (3, 2)])
+    othello_state = OthelloState(the_board, color)
+    return othello_state.random_move()
 
+
+class OthelloState:
+    def __init__(self, the_board: board, agent_color: str):
+        self.the_board = the_board
+        self.agent_color = agent_color
+        self.rival_color = "W" if agent_color == "B" else "B"
+
+    def valid_moves(self):
+        valid_moves = self.the_board.legal_moves(self.agent_color)
+        return valid_moves
+
+    def random_move(self):
+        if len(self.valid_moves()) > 0:
+            return random.choice(self.valid_moves())
+        else:
+            return (-1, -1)
