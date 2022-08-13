@@ -22,9 +22,7 @@ def make_move(the_board, color):
     # a primeira jogada com as pretas.
     # Remova-o e coloque a sua implementacao da poda alpha-beta
     othello_state = OthelloState(the_board, color)
-    # print("RETORNO DO MAKE MOVE: ", othello_state.minimax_strategy(color, the_board))
     return othello_state.minimax_strategy(color, the_board)
-    # return othello_state.random_move(color)
 
 
 class OthelloState:
@@ -43,14 +41,11 @@ class OthelloState:
             return (-1, -1)
 
         agent_movement = random.choice(valid_moves)
-        # print("AGENT_MOVEMENT: ", agent_movement)
 
         alpha = -math.inf
         beta = math.inf
 
         for move in valid_moves:
-            # virtual_board = deepcopy(board)
-            # virtual_board.process_move(move, self.agent_color)
             evaluation = self.minimax_alpha_beta(board, 3, alpha, beta, color)
 
             if evaluation > alpha:
@@ -90,7 +85,6 @@ class OthelloState:
                 beta = min(beta, evaluation)
                 if beta <= alpha:
                     break
-            # print("MIN_EVAL: ", min_eval)
             return min_eval
 
     def piece_score(self, board: board, color: str):
@@ -141,14 +135,6 @@ class OthelloState:
                     player_points += self.WEIGHT_MAP[x][y]
                 elif self.board.tiles[x][y] == self.rival_color:
                     rival_points += self.WEIGHT_MAP[x][y]
-
-        # for x, tile in enumerate(self.board.tiles):
-        #     for y, piece in enumerate(tile):
-        #         if piece == self.agent_color:
-        #             player_points += self.__POINT_MAP[x][y]
-        #         elif piece == self.rival_color:
-        #             enemy_points += self.__POINT_MAP[x][y]
-
         return player_points - rival_points
 
     def heuristics_eval(self, board, color):
