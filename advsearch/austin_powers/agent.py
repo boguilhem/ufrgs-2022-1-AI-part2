@@ -1,4 +1,3 @@
-import random
 import math
 from copy import deepcopy
 from typing import Tuple
@@ -39,7 +38,7 @@ class OthelloState:
         if len(valid_moves) == 0:
             return (-1, -1)
 
-        agent_movement = random.choice(valid_moves)
+        agent_movement = valid_moves[0]
 
         alpha = -math.inf
         beta = math.inf
@@ -98,44 +97,44 @@ class OthelloState:
         :return: int
         """
         # numero de jogadas possiveis do jogador
-        player_moves = self.num_player_moves
+        agent_pieces = self.num_player_moves
 
-        # # numero de jogadas possiveis do oponente
-        opponent_moves = self.num_opponent_moves
+        # numero de jogadas possiveis do oponente
+        rival_pieces = self.num_opponent_moves
 
         # retorna o score baseado na quantidade de movimentos possíveis
-        if opponent_moves + player_moves != 0:
-            movement_score = 100 * (player_moves - opponent_moves) / (player_moves + opponent_moves)
+        movement_score = 0
+        if rival_pieces + agent_pieces == 0:
+            return movement_score
         else:
-            movement_score = 0
-
+            movement_score = 100 * (agent_pieces - rival_pieces) / (agent_pieces + rival_pieces)
         return movement_score
 
     WEIGHT_MAP = [
         [100, -10, 20, 10, 10, 20, -10, 100],
-        [-10, -20, 1, 1, 1, 1, -20, -10],
-        [15, 1, 10, 5, 5, 10, 1, 15],
-        [10, 1, 5, 5, 5, 5, 1, 10],
-        [10, 1, 5, 5, 5, 5, 1, 10],
-        [15, 1, 10, 5, 5, 10, 1, 15],
-        [-10, -20, 1, 1, 1, 1, -20, -10],
+        [-10, -20, -5, -5, -5, -5, -20, -10],
+        [15, -5, 10, 5, 5, 10, -5, 15],
+        [10, -5, 5, 5, 5, 5, -5, 10],
+        [10, -5, 5, 5, 5, 5, -5, 10],
+        [15, -5, 10, 5, 5, 10, -5, 15],
+        [-10, -20, -5, -5, -5, -5, -20, -10],
         [100, -10, 20, 10, 10, 20, -10, 100],
     ]
 
     def map_score(self):
-        agent_score = 0
-        rival_score = 0
+        player_points = 0
+        rival_points = 0
 
         for x in range(8):
             for y in range(8):
                 if self.board.tiles[x][y] == self.agent_color:
-                    agent_score += self.WEIGHT_MAP[x][y]
+                    player_points += self.WEIGHT_MAP[x][y]
                 elif self.board.tiles[x][y] == self.rival_color:
-                    rival_score += self.WEIGHT_MAP[x][y]
-        return agent_score - rival_score
+                    rival_points += self.WEIGHT_MAP[x][y]
+        return player_points - rival_points
 
     def heuristics_eval(self):
-        movements_score_heuristic = self.movements_score() * 0.3
-        map_score_heuristic = self.map_score() * 0.7
-        final_heuristic = map_score_heuristic + movements_score_heuristic
+        movements_score_heuristic = self.movements_score()
+        map_score_heuristic = self.map_score()
+        final_heuristic = map_score_heuristic * 0.4 + movements_score_heuristic * 0.6
         return final_heuristic
