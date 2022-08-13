@@ -35,7 +35,6 @@ class OthelloState:
 
     def minimax_strategy(self, color, board) -> Tuple[int, int]:
         valid_moves = board.legal_moves(color)
-        print("MOVIMENTOS VALIDOS FIRST: ", valid_moves)
 
         if len(valid_moves) == 0:
             return (-1, -1)
@@ -51,7 +50,6 @@ class OthelloState:
             if evaluation > alpha:
                 alpha = evaluation
                 agent_movement = move
-        print("ALPHA: ", alpha)
         return agent_movement
 
     def minimax_alpha_beta(self, board: board, depth: int, alpha, beta, color: str):
@@ -105,45 +103,39 @@ class OthelloState:
         # # numero de jogadas possiveis do oponente
         opponent_moves = self.num_opponent_moves
 
-        # movement_score = player_moves - opponent_moves
+        # retorna o score baseado na quantidade de movimentos possíveis
+        if opponent_moves + player_moves != 0:
+            movement_score = 100 * (player_moves - opponent_moves) / (player_moves + opponent_moves)
+        else:
+            movement_score = 0
 
-        # # retorna o score baseado na quantidade de movimentos possíveis
-        # return movement_score
-
-        if opponent_moves + player_moves == 0:
-            return 0
-        return 100 * (player_moves - opponent_moves) / (player_moves + opponent_moves)
+        return movement_score
 
     WEIGHT_MAP = [
-        [1000, -10, 20, 10, 10, 20, -10, 1000],
+        [100, -10, 20, 10, 10, 20, -10, 100],
         [-10, -20, 1, 1, 1, 1, -20, -10],
         [15, 1, 10, 5, 5, 10, 1, 15],
         [10, 1, 5, 5, 5, 5, 1, 10],
         [10, 1, 5, 5, 5, 5, 1, 10],
         [15, 1, 10, 5, 5, 10, 1, 15],
         [-10, -20, 1, 1, 1, 1, -20, -10],
-        [1000, -10, 20, 10, 10, 20, -10, 1000],
+        [100, -10, 20, 10, 10, 20, -10, 100],
     ]
 
     def map_score(self):
-        player_points = 0
-        rival_points = 0
+        agent_score = 0
+        rival_score = 0
 
         for x in range(8):
             for y in range(8):
                 if self.board.tiles[x][y] == self.agent_color:
-                    player_points += self.WEIGHT_MAP[x][y]
+                    agent_score += self.WEIGHT_MAP[x][y]
                 elif self.board.tiles[x][y] == self.rival_color:
-                    rival_points += self.WEIGHT_MAP[x][y]
-        return player_points - rival_points
+                    rival_score += self.WEIGHT_MAP[x][y]
+        return agent_score - rival_score
 
-    def heuristics_eval(self, board, color):
-        # piece_score_heuristic = self.piece_score(board, color)
-        movements_score_heuristic = self.movements_score()
-        map_score_heuristic = self.map_score()
-        # final_heuristic = (
-        #     (piece_score_heuristic * 0.25) + (movements_score_heuristic * 0.25) + (map_score_heuristic * 0.5)
-        # )
-        # print("HEURISTICS EVAL: ", final_heuristic)
-        # return map_score_heuristic
-        return map_score_heuristic * 0.4 + movements_score_heuristic * 0.6
+    def heuristics_eval(self):
+        movements_score_heuristic = self.movements_score() * 0.3
+        map_score_heuristic = self.map_score() * 0.7
+        final_heuristic = map_score_heuristic + movements_score_heuristic
+        return final_heuristic
