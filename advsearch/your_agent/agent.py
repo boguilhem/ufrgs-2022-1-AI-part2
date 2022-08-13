@@ -57,7 +57,7 @@ class OthelloState:
         num_valid_moves = len(valid_moves)
 
         if depth == 0 or board.is_terminal_state():
-            return self.heuristics_eval(board, color)
+            return self.heuristics_eval()
 
         if color == self.agent_color:
             self.num_player_moves = num_valid_moves
