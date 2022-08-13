@@ -1,7 +1,3 @@
-# Link Enunciado
-
-https://docs.google.com/document/d/1JIsREplmuHExCkrKPccckcjh9f6uffVmIRp1bF5figA/edit
-
 # Kit othello
 
 Kit para executar partidas de Othello e implementar o algoritmo de poda alfa-beta.
